@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Roommates.Models
 {
-    internal class Room
+    public class Room
     {
         public int Id { get; set; }
         public string Name { get; set; }

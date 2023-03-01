@@ -12,6 +12,7 @@ namespace Roommates
         static void Main(string[] args)
         {
             RoomRepository roomRepo = new RoomRepository(CONNECTION_STRING);
+            ChoreRepository choreRepo = new ChoreRepository(CONNECTION_STRING);
 
             bool runProgram = true;
             while (runProgram)
@@ -59,6 +60,41 @@ namespace Roommates
 
                         Console.ReadKey();
                         break;
+                    case ("Show all Chores"):
+                        List<Chore> chores = choreRepo.GetAll();
+                        foreach (Chore c in chores)
+                        {
+                            Console.WriteLine($"{c.Name} has an Id of {c.Id}");
+                        }
+                        Console.Write("Press any key to continue");
+                        Console.ReadKey();
+                        break;
+                    case ("Search for chore"):
+                        Console.Write("Chore Id: ");
+                        int id1 = int.Parse(Console.ReadLine());
+
+                        Chore chore = choreRepo.GetById(id1);
+
+                        Console.WriteLine($"{chore.Id} - {chore.Name}");
+                        Console.Write("Press any key to continue");
+                        Console.ReadKey();
+                        break;
+                    case ("Add a chore"):
+                        Console.Write("Chore name: ");
+                        string choreName = Console.ReadLine();
+
+                        Chore choreToAdd = new Chore()
+                        {
+                            Name = choreName,
+                        };
+
+                        choreRepo.Insert(choreToAdd);
+
+                        Console.WriteLine($"{choreToAdd.Name} has been added and assigned an Id of {choreToAdd.Id}");
+                        Console.Write("Press any key to continue");
+
+                        Console.ReadKey();
+                        break;
                     case ("Exit"):
                         runProgram = false;
                         break;
@@ -76,6 +112,9 @@ namespace Roommates
                 "Show all rooms",
                 "Search for room",
                 "Add a room",
+                "Show all Chores",
+                "Search for chore",
+                "Add a chore",
                 "Exit"
             };
 
