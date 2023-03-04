@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
+using System.Data;
 
 namespace Roommates.Repositories
 {
@@ -25,7 +27,7 @@ namespace Roommates.Repositories
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    List<Chore> chores = new List<Chore>(); 
+                    List<Chore> chores = new List<Chore>();
 
                     while (reader.Read())
                     {
@@ -45,7 +47,7 @@ namespace Roommates.Repositories
                         chores.Add(chore);
                     }
 
-                    reader.Close(); 
+                    reader.Close();
 
                     return chores;
                 }
@@ -53,7 +55,7 @@ namespace Roommates.Repositories
         }
 
 
-        public Chore? GetById(int id) 
+        public Chore? GetById(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -67,7 +69,7 @@ namespace Roommates.Repositories
                     {
                         if (reader.Read())
                         {
-                           chore = new Chore()
+                            chore = new Chore()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Name = reader.GetString(reader.GetOrdinal("Name"))
@@ -94,5 +96,45 @@ namespace Roommates.Repositories
                 }
             }
         }
+
+        public List<Chore>? GetUnassignedChores()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                var sql = @"SELECT rc.[Id]
+                                      ,rc.[RoommateId]
+                                      ,rc.[ChoreId]
+	                                  ,c.[Name]
+                                      FROM [Roommates].[dbo].[RoommateChore] rc
+                                      JOIN [Roommates].[dbo].[Chore] c ON rc.ChoreId= c.id
+                                      Where RoommateId is null";
+
+
+                var chores = conn.Query<Chore>(sql).ToList();
+                return chores;
+
+            }
+        }
+
+        public void AssignChore (int roommateId, int choreId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO RoommateChore (RoommateId, ChoreId) 
+                                        VALUES (@RoommateId,@ChoreId)";
+
+                    cmd.Parameters.AddWithValue("@RoommateId", roommateId); 
+                    cmd.Parameters.AddWithValue("@ChoreId", choreId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+
     }
 }

@@ -13,6 +13,7 @@ namespace Roommates
         {
             RoomRepository roomRepo = new RoomRepository(CONNECTION_STRING);
             ChoreRepository choreRepo = new ChoreRepository(CONNECTION_STRING);
+            RoommateRepository RoommateRepo = new RoommateRepository(CONNECTION_STRING);
 
             bool runProgram = true;
             while (runProgram)
@@ -95,6 +96,40 @@ namespace Roommates
 
                         Console.ReadKey();
                         break;
+                    case ("Show all Unassigned Chores"):
+                        List<Chore> unassignedChores = choreRepo.GetUnassignedChores();
+                        foreach (Chore c in unassignedChores)
+                        {
+                            Console.WriteLine($"{c.Name} has an Id of {c.Id}");
+                        }
+                        Console.Write("Press any key to continue");
+                        Console.ReadKey();
+                        break;
+                    case ("Assign a chore"):
+                        Console.Write("Chore Id to assign: ");
+                        int choreid = int.Parse(Console.ReadLine());
+                        Console.Write("Assign to Roommate Id: ");
+                        int assignroommateid = int.Parse(Console.ReadLine());
+
+                        choreRepo.AssignChore(assignroommateid, choreid);
+
+                        Console.WriteLine($"Chore {choreid} was assigned to roommate {assignroommateid}");
+                        Console.Write("Press any key to continue");
+                        Console.ReadKey();
+                        break;
+                    case ("Search for roommate"):
+                        Console.Write("Roommate Id: ");
+                        int roommateid = int.Parse(Console.ReadLine());
+
+                        Roommate roommate = RoommateRepo.GetById(roommateid);
+
+                        Console.WriteLine(@$"{roommate.Id}
+                        {roommate.FirstName}
+                        {roommate.RentPortion}
+                        {roommate.Room.Name}");
+                        Console.Write("Press any key to continue");
+                        Console.ReadKey();
+                        break;
                     case ("Exit"):
                         runProgram = false;
                         break;
@@ -114,7 +149,10 @@ namespace Roommates
                 "Add a room",
                 "Show all Chores",
                 "Search for chore",
+                "Show all Unassigned Chores",
+                "Assign a chore",
                 "Add a chore",
+                "Search for roommate",
                 "Exit"
             };
 
